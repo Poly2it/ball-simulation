@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "WD=\"$(pwd | cut -c 3-)\" && \"./scripts/environment.sh\" <<< \"cd \\\"${WD}\\\" && make BUILD_TYPE=debug\"",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build and run",
+            "type": "shell",
+            "command": "WD=\"$(pwd | cut -c 3-)\" && \"./scripts/environment.sh\" <<< \"cd \\\"${WD}\\\" && make BUILD_TYPE=debug && \\\"./game.exe\\\"\"",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ],
+}
