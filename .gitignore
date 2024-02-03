@@ -5,6 +5,8 @@
 /resources/share/*
 !/resources/share/.gitkeep
 
+/game
+
 compile_commands.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/c,linux,windows,visualstudiocode,vim
