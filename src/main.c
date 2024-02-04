@@ -11,6 +11,7 @@
 
 
 #define DEBUG_LOG_INFO
+/* #define DEBUG_LOG_LOOP */
 
 
 #define DEBUG_PRINTF(...) printf("%s %i: ", __FILE__, __LINE__); printf(__VA_ARGS__);
@@ -227,12 +228,12 @@ const f32 SIMULATION_H = 2048.0f;
 
 
 Grid* grid_create(void) {
-    DEBUG_PRINTF_LOOP("Creating grid\n");
+    DEBUG_PRINTF_INFO("Creating grid\n");
 
     Link** row;
     Link* column;
 
-    Link*** link_head = malloc(sizeof(Link**) * GRID_W);
+    Link*** link_head = malloc(sizeof(Link**) * (GRID_W + 2));
 
     Grid* grid = malloc(sizeof(Grid));
     *grid = (Grid) {
@@ -241,16 +242,19 @@ Grid* grid_create(void) {
         .validator = 2020,
         .link = link_head
     };
+    DEBUG_PRINTF_INFO("Grid allocated\n");
 
     for (uaddr x = 0; x < GRID_W + 2; x += 1) {
-        *(link_head + x) = malloc(sizeof(Link*) * GRID_H);
+        *(link_head + x) = malloc(sizeof(Link*) * (GRID_H + 2));
         row = *(link_head + x);
 
         for (uaddr y = 0; y < GRID_H + 2; y += 1) {
+            DEBUG_PRINTF_LOOP("Allocating %i, %i\n", (int) x, (int) y);
             *(row + y) = link_create();
         }
     }
 
+    DEBUG_PRINTF_INFO("Grid complete\n");
     return grid;
 }
 
@@ -475,8 +479,9 @@ void PositionComponents(WindowState* window, Camera2D* camera) {
 int main(void){
     DEBUG_ASSERT("Grid cell fits maximum-size entity", ((SIMULATION_W / GRID_W) > BALL_MAXIMUM_RADIUS));
     struct timespec time;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &time);
-    uint64_t time_nanos = time.tv_nsec;
+    // clock_gettime(CLOCK_MONOTONIC_RAW, &time);
+    // uint64_t time_nanos = time.tv_nsec;
+    u64 time_nanos = 128481284919;
     random_u32_seed((uint32_t[4]) {
         time_nanos >> 00,
         time_nanos >> 16,
@@ -486,11 +491,12 @@ int main(void){
     random_u32_jump();
 
     WindowState window = (WindowState) { 850, 450 };
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    SetTraceLogLevel(LOG_ERROR);
+    // SetConfigFlags(FLAG_MSAA_4X_HINT);
+    // SetTraceLogLevel(LOG_ERROR);
     InitWindow(window.w, window.h, "raylib");
     SetWindowState(
         FLAG_VSYNC_HINT |
+	FLAG_WINDOW_TOPMOST |
         FLAG_WINDOW_RESIZABLE
     );
 

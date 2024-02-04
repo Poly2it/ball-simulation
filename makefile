@@ -20,7 +20,7 @@ DEPENDENCY = ./scripts/dependencies.sh
 SOURCE     = ./src
 
 # release | debug
-BUILD_TYPE = release
+BUILD_TYPE = debug
 
 CC       = cc
 CFLAGS_I = -L$(PREFIX)/include -L$(EXTERNAL_SHARE)/include -W -O
