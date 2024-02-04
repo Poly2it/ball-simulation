@@ -42,6 +42,7 @@ endif
 CFLAGS_I += $(CFLAGS) -$(OPTIMIZATION_LEVEL)
 LDLIBS_I += $(LDLIBS)
 
+
 all: game
 install: game
 	mkdir -p "$(DESTDIR)$(PREFIX)/bin"
@@ -49,18 +50,36 @@ install: game
 uninstall: game
 	rm "$(DESTDIR)$(PREFIX)/bin/game"
 clean:
-	rm -f "build/*"
+	rm -f "$(BUILD)/"*
+	touch "$(BUILD)/".gitkeep
 
-game: $(BUILD)/main.o
+
+game: $(BUILD)/main.o $(BUILD)/xoshiro128plus.o $(BUILD)/vector.o raylib
 	$(CC) $(LDFLAGS) \
 		-o game \
 		$(BUILD)/main.o \
+		$(BUILD)/xoshiro128plus.o \
+		$(BUILD)/vector.o \
 		$(LDLIBS_I)
-$(BUILD)/main.o: $(SOURCE)/main.c raylib
+
+$(BUILD)/main.o: $(SOURCE)/main.c
 	$(CC) \
 		-c $(CFLAGS_I) \
 		-o $(BUILD)/main.o \
-		$(SOURCE)/main.c \
+		$(SOURCE)/main.c
+
+$(BUILD)/xoshiro128plus.o: $(SOURCE)/algorithms/xoshiro128plus.c
+	$(CC) \
+		-c $(CFLAGS_I) \
+		-o $(BUILD)/xoshiro128plus.o \
+		$(SOURCE)/algorithms/xoshiro128plus.c
+
+$(BUILD)/vector.o: $(SOURCE)/vector.c
+	$(CC) \
+		-c $(CFLAGS_I) \
+		-o $(BUILD)/vector.o \
+		$(SOURCE)/vector.c
+
 
 raylib:
 	"$(DEPENDENCY)" raylib all
