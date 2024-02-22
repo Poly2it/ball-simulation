@@ -9,7 +9,7 @@
 
 compile_commands.json
 .ccls-cache/
-valgrind-out.txt
+valgrind-*.txt
 
 # Created by https://www.toptal.com/developers/gitignore/api/c,linux,windows,visualstudiocode,vim
 # Edit at https://www.toptal.com/developers/gitignore?templates=c,linux,windows,visualstudiocode,vim
