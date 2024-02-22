@@ -1,4 +1,4 @@
-# Ball simulation
+# Ball Simulation
 
 ![Preview](docs/preview.png)
 
