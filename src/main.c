@@ -219,12 +219,12 @@ typedef struct {
 } Grid;
 
 
-const uaddr GRID_W = 64;
-const uaddr GRID_H = 64;
+const uaddr GRID_W = 32;
+const uaddr GRID_H = 32;
 
 
-const f32 SIMULATION_W = 2048.0f;
-const f32 SIMULATION_H = 2048.0f;
+const f32 SIMULATION_W = 1024.0f;
+const f32 SIMULATION_H = 1024.0f;
 
 
 Grid* grid_create(void) {
@@ -302,8 +302,8 @@ void ball_update_position(Ball* ball, f32 dt) {
 }
 
 
-void ball_update_acceleration(Ball* ball, V2 acceleration) {
-    ball->acceleration = add_v2(ball->acceleration, acceleration);
+void ball_update_acceleration(Ball* ball, V2 acceleration, f32 dt) {
+    ball->acceleration = add_v2(ball->acceleration, mul_v2_f32(acceleration, dt));
 }
 
 
@@ -339,7 +339,7 @@ void ball_solve_collisions(Ball* ball_a, Link* tile_link[9], f32 dt) {
                 f32 minimum_intersection = ball_a->radius + ball_b->radius;
                 if (distance < minimum_intersection) {
                     V2 normal = div_v2_f32(collision_axis, distance);
-                    f32 delta = minimum_intersection - distance;
+                    f32 delta = (minimum_intersection - distance);
                     ball_a->position = add_v2(
                         ball_a->position,
                         mul_v2_f32(normal, 0.5f * delta)
@@ -357,7 +357,7 @@ void ball_solve_collisions(Ball* ball_a, Link* tile_link[9], f32 dt) {
 }
 
 
-const V2 GRAVITY = { 0.0f, 500.0f };
+const V2 GRAVITY = { 0.0f, 500000.0f };
 
 
 void ball_solve_scene_constraints(Ball* ball) {
@@ -369,8 +369,8 @@ void ball_solve_scene_constraints(Ball* ball) {
 }
 
 
-const f32 BALL_MINIMUM_RADIUS = 8.0f;
-const f32 BALL_MAXIMUM_RADIUS = 16.0f;
+const f32 BALL_MINIMUM_RADIUS = 7.0f;
+const f32 BALL_MAXIMUM_RADIUS = 9.0f;
 
 
 void init(Grid* grid, Ball* balls, u32 ball_count, f32 dt) {
@@ -396,8 +396,8 @@ void init(Grid* grid, Ball* balls, u32 ball_count, f32 dt) {
 
 
 void tick(Grid* grid, Ball* balls, u32 ball_count, f32 dt) {
-    u16 sub_steps = 4;
-    f32 sub_dt = dt / sub_steps;
+    u16 sub_steps = 8;
+    f32 sub_dt = min_f32(dt / sub_steps, 1.0f / 60.0f / sub_steps);
     for (u16 step = 0; step < sub_steps; step += 1) {
         for (uaddr x = 0; x < grid->w; x += 1) {
             Link* link_grid[9] = {
@@ -415,7 +415,7 @@ void tick(Grid* grid, Ball* balls, u32 ball_count, f32 dt) {
 
                 while (link->length > 0) {
                     Ball* ball = link->ball;
-                    ball_update_acceleration(ball, GRAVITY);
+                    ball_update_acceleration(ball, GRAVITY, sub_dt);
                     ball_solve_collisions(ball, link_grid, sub_dt);
                     ball_update_position(ball, sub_dt);
 
@@ -479,9 +479,8 @@ void PositionComponents(WindowState* window, Camera2D* camera) {
 int main(void){
     DEBUG_ASSERT("Grid cell fits maximum-size entity", ((SIMULATION_W / GRID_W) > BALL_MAXIMUM_RADIUS));
     struct timespec time;
-    // clock_gettime(CLOCK_MONOTONIC_RAW, &time);
-    // uint64_t time_nanos = time.tv_nsec;
-    u64 time_nanos = 128481284919;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    uint64_t time_nanos = time.tv_nsec;
     random_u32_seed((uint32_t[4]) {
         time_nanos >> 00,
         time_nanos >> 16,
@@ -491,8 +490,8 @@ int main(void){
     random_u32_jump();
 
     WindowState window = (WindowState) { 850, 450 };
-    // SetConfigFlags(FLAG_MSAA_4X_HINT);
-    // SetTraceLogLevel(LOG_ERROR);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
+
     InitWindow(window.w, window.h, "raylib");
     SetWindowState(
         FLAG_VSYNC_HINT |
@@ -514,7 +513,7 @@ int main(void){
     f32 fps;
 
     Grid* grid = grid_create();
-    const uaddr BALL_COUNT = 3000;
+    const uaddr BALL_COUNT = 1500;
     Ball balls[BALL_COUNT];
 
     init(grid, balls, BALL_COUNT, dt);
