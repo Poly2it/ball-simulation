@@ -479,7 +479,11 @@ void PositionComponents(WindowState* window, Camera2D* camera) {
 int main(void){
     DEBUG_ASSERT("Grid cell fits maximum-size entity", ((SIMULATION_W / GRID_W) > BALL_MAXIMUM_RADIUS));
     struct timespec time;
+#ifdef __linux__
+    clock_gettime(CLOCK_MONOTONIC_RAW, &time);
+#else
     clock_gettime(CLOCK_MONOTONIC, &time);
+#endif
     uint64_t time_nanos = time.tv_nsec;
     random_u32_seed((uint32_t[4]) {
         time_nanos >> 00,
@@ -513,7 +517,7 @@ int main(void){
     f32 fps;
 
     Grid* grid = grid_create();
-    const uaddr BALL_COUNT = 1500;
+    const uaddr BALL_COUNT = 1800;
     Ball balls[BALL_COUNT];
 
     init(grid, balls, BALL_COUNT, dt);
