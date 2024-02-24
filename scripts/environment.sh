@@ -37,7 +37,7 @@ main() {
             if $(which git          2>&1 1>/dev/null); then PROGRAM_COUNT+=1; fi; PROGRAM_COUNT_TARGET+=1
 
             if [ ${PROGRAM_COUNT} -eq ${PROGRAM_COUNT_TARGET} ]; then
-                bash
+                sh
             else
                 print "Unsuitable environment on unsupported platform"
                 print "You may contact the authors for further assistance (${PROGRAM_AUTHOR})"

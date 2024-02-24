@@ -9,6 +9,12 @@ PROGRAM_WORKING_DIRECTORY="$(dirname "$(readlink -f "${PROGRAM_LOCATION}")")"
 
 
 case "$(uname -o)" in
+    "Linux" | "GNU/Linux")
+        . "${PROGRAM_WORKING_DIRECTORY}/scripts/lib_linux.sh"
+        ;;
+    "Darwin")
+        . "${PROGRAM_WORKING_DIRECTORY}/scripts/lib_darwin.sh"
+        ;;
     "Msys")
         PROGRAM_WORKING_DIRECTORY_W64DEVKIT="$( \
             echo ${PROGRAM_WORKING_DIRECTORY} \
@@ -30,9 +36,6 @@ case "$(uname -o)" in
         ;;
     "MS/Windows")
         . "${PROGRAM_WORKING_DIRECTORY}/scripts/lib_w64devkit.sh"
-        ;;
-    "Linux" | "GNU/Linux")
-        . "${PROGRAM_WORKING_DIRECTORY}/scripts/lib_linux.sh"
         ;;
     *)
         break
@@ -94,14 +97,14 @@ raylib_require() {
 
 raylib_build() {
     (
-        cd "raylib/src"
+        cd "${PROGRAM_WORKING_DIRECTORY}/resources/external/raylib/src"
         HASH_LOCAL="$( \
             git log \
                 --max-count=1 \
                 --pretty=format:"%H"
         )"
-        if [ ! "$(cat BUILD_HASH)" = "${HASH_LOCAL}" ]; then
-            make -j$(nproc) 1>&3 2>&4
+        if [ ! "$(cat BUILD_HASH 2>/dev/null)" = "${HASH_LOCAL}" ]; then
+            make -j$(nproc)
             echo "${HASH_LOCAL}" > "BUILD_HASH"
         fi
     )
@@ -110,24 +113,28 @@ raylib_build() {
 
 raylib_install() {
     (
-        cd "raylib/src"
+        cd "${PROGRAM_WORKING_DIRECTORY}/resources/external/raylib/src"
 
-        mkdir --parents "$(path_local_share_get)/lib"
-        mkdir --parents "$(path_local_share_get)/include"
+        directory_create_recursive "$(path_local_share_get)/lib"
+        directory_create_recursive "$(path_local_share_get)/include"
 
-        cp --update --verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a"
-        cp --update --verbose raylib.h "$(path_local_share_get)/include/raylib.h"
-        cp --update --verbose raymath.h "$(path_local_share_get)/include/raymath.h"
-        cp --update --verbose rlgl.h "$(path_local_share_get)/include/rlgl.h"
+        file_copy_verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a" \
+            || ( 
+                raylib_build \
+                && file_copy_verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a"
+            )
+        file_copy_verbose raylib.h  "$(path_local_share_get)/include/raylib.h"
+        file_copy_verbose raymath.h "$(path_local_share_get)/include/raymath.h"
+        file_copy_verbose rlgl.h    "$(path_local_share_get)/include/rlgl.h"
     )
 }
 
 
-raylib_uinstall() {
-    rm "$(path_local_share_get)/lib/libraylib.a"
-    rm "$(path_local_share_get)/include/raylib.h"
-    rm "$(path_local_share_get)/include/raymath.h"
-    rm "$(path_local_share_get)/include/rlgl.h"
+raylib_uninstall() {
+    file_destroy "$(path_local_share_get)/lib/libraylib.a"
+    file_destroy "$(path_local_share_get)/include/raylib.h"
+    file_destroy "$(path_local_share_get)/include/raymath.h"
+    file_destroy "$(path_local_share_get)/include/rlgl.h"
 }
 
 
@@ -156,13 +163,13 @@ raylib_all() {
             cd "raylib/src"
             make -j$(nproc) 1>&3 2>&4
 
-            mkdir --parents "$(path_local_share_get)/lib"
-            mkdir --parents "$(path_local_share_get)/include"
+            directory_create_recursive "$(path_local_share_get)/lib"
+            directory_create_recursive "$(path_local_share_get)/include"
 
-            cp --update libraylib.a "$(path_local_share_get)/lib/libraylib.a"
-            cp --update raylib.h "$(path_local_share_get)/include/raylib.h"
-            cp --update raymath.h "$(path_local_share_get)/include/raymath.h"
-            cp --update rlgl.h "$(path_local_share_get)/include/rlgl.h"
+            file_copy_verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a"
+            file_copy_verbose raylib.h "$(path_local_share_get)/include/raylib.h"
+            file_copy_verbose raymath.h "$(path_local_share_get)/include/raymath.h"
+            file_copy_verbose rlgl.h "$(path_local_share_get)/include/rlgl.h"
         )
     else
         (
@@ -186,13 +193,13 @@ raylib_all() {
                 (
                     cd "src"
                     
-                    mkdir --parents "$(path_local_share_get)/lib"
-                    mkdir --parents "$(path_local_share_get)/include"
+                    directory_create_recursive "$(path_local_share_get)/lib"
+                    directory_create_recursive "$(path_local_share_get)/include"
 
-                    cp --update --verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a"
-                    cp --update --verbose raylib.h "$(path_local_share_get)/include/raylib.h"
-                    cp --update --verbose raymath.h "$(path_local_share_get)/include/raymath.h"
-                    cp --update --verbose rlgl.h "$(path_local_share_get)/include/rlgl.h"
+                    file_copy_verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a"
+                    file_copy_verbose raylib.h "$(path_local_share_get)/include/raylib.h"
+                    file_copy_verbose raymath.h "$(path_local_share_get)/include/raymath.h"
+                    file_copy_verbose rlgl.h "$(path_local_share_get)/include/rlgl.h"
                 )
                 echo "${PATH_TARGET}: Finished updating, up to date"
             fi
