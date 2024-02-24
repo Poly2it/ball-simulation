@@ -57,7 +57,7 @@ CFLAGS_I += $(CFLAGS) -$(OPTIMIZATION_LEVEL)
 LDLIBS_I += $(LDLIBS)
 
 
-.PHONY: all install uninstall clean
+.PHONY: all install uninstall clean raylib
 
 
 all: game

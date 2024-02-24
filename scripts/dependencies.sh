@@ -159,18 +159,7 @@ raylib_all() {
             git checkout "${HASH_REQUIRED}" 2>&1 1>&3 || exit 1
         fi
 
-        (
-            cd "raylib/src"
-            make -j$(nproc) 1>&3 2>&4
-
-            directory_create_recursive "$(path_local_share_get)/lib"
-            directory_create_recursive "$(path_local_share_get)/include"
-
-            file_copy_verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a"
-            file_copy_verbose raylib.h "$(path_local_share_get)/include/raylib.h"
-            file_copy_verbose raymath.h "$(path_local_share_get)/include/raymath.h"
-            file_copy_verbose rlgl.h "$(path_local_share_get)/include/rlgl.h"
-        )
+        raylib_install
     else
         (
             cd "${PATH_TARGET}"
@@ -188,20 +177,9 @@ raylib_all() {
                 git fetch 2>&1 1>&3 || exit 1
                 git checkout "${HASH_REQUIRED}" 2>&1 1>&3 || exit 1
 
-                make -j$(nproc) 1>&3 2>&4
-
-                (
-                    cd "src"
-                    
-                    directory_create_recursive "$(path_local_share_get)/lib"
-                    directory_create_recursive "$(path_local_share_get)/include"
-
-                    file_copy_verbose libraylib.a "$(path_local_share_get)/lib/libraylib.a"
-                    file_copy_verbose raylib.h "$(path_local_share_get)/include/raylib.h"
-                    file_copy_verbose raymath.h "$(path_local_share_get)/include/raymath.h"
-                    file_copy_verbose rlgl.h "$(path_local_share_get)/include/rlgl.h"
-                )
                 echo "${PATH_TARGET}: Finished updating, up to date"
+
+                raylib_install
             fi
         )
     fi
