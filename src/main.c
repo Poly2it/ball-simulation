@@ -467,11 +467,12 @@ typedef struct {
 
 
 void PositionComponents(WindowState* window, Camera2D* camera) {
+    Vector2 window_dpi = GetWindowScaleDPI();
     *window = (WindowState) { GetRenderWidth(), GetRenderHeight() };
-    camera->zoom = 0.8f / (min_f32(SIMULATION_W, SIMULATION_H) / min_s16(window->w, window->h));
+    camera->zoom = 0.8f / (min_f32(SIMULATION_W, SIMULATION_H) / min_f32((f32) window->w / window_dpi.x, (f32) window->h / window_dpi.y));
     camera->offset = (Vector2) {
-        (window->w - SIMULATION_W * camera->zoom) / 2.0f,
-        (window->h - SIMULATION_H * camera->zoom) / 2.0f
+        ((window->w * window_dpi.x) - (SIMULATION_W * camera->zoom)) / 2.0f,
+        ((window->h * window_dpi.y) - (SIMULATION_H * camera->zoom)) / 2.0f
     };
 }
 
@@ -494,14 +495,19 @@ int main(void){
     random_u32_jump();
 
     WindowState window = (WindowState) { 850, 450 };
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    SetConfigFlags(
+        FLAG_MSAA_4X_HINT |
+        FLAG_WINDOW_HIGHDPI
+    );
 
     InitWindow(window.w, window.h, "raylib");
     SetWindowState(
         FLAG_VSYNC_HINT |
-	FLAG_WINDOW_TOPMOST |
+        FLAG_WINDOW_TOPMOST |
         FLAG_WINDOW_RESIZABLE
     );
+
+    SetTextureFilter(GetFontDefault().texture, TEXTURE_FILTER_POINT);
 
     Camera2D camera = (Camera2D) {
         { 0, 0 },
