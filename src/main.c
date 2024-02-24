@@ -471,8 +471,8 @@ void PositionComponents(WindowState* window, Camera2D* camera) {
     *window = (WindowState) { GetRenderWidth(), GetRenderHeight() };
     camera->zoom = 0.8f / (min_f32(SIMULATION_W, SIMULATION_H) / min_f32((f32) window->w / window_dpi.x, (f32) window->h / window_dpi.y));
     camera->offset = (Vector2) {
-        ((window->w * window_dpi.x) - (SIMULATION_W * camera->zoom)) / 2.0f,
-        ((window->h * window_dpi.y) - (SIMULATION_H * camera->zoom)) / 2.0f
+        ((window->w / window_dpi.x) - (SIMULATION_W * camera->zoom)) / 2.0f,
+        ((window->h / window_dpi.y) - (SIMULATION_H * camera->zoom)) / 2.0f
     };
 }
 

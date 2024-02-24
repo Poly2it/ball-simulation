@@ -9,13 +9,13 @@ SHELL = sh
 PLATFORM_OS = $(shell uname -o)
 
 ifeq ($(PLATFORM_OS),Linux)
-	EXTERNAL_SHARE = $(shell . scripts/lib_linux.sh && path_local_share_get)
+	EXTERNAL_SHARE = $(shell echo ". scripts/lib_linux.sh && path_local_share_get" | scripts/environment.sh)
 else
 ifeq ($(PLATFORM_OS),MS/Windows)
-	EXTERNAL_SHARE = $(shell . scripts/lib_w64devkit.sh && path_local_share_get)
+	EXTERNAL_SHARE = $(shell echo ". scripts/lib_w64devkit.sh && path_local_share_get" | scripts/environment.sh)
 else
 ifeq ($(PLATFORM_OS),Darwin)
-	EXTERNAL_SHARE = $(shell . scripts/lib_darwin.sh && path_local_share_get)
+	EXTERNAL_SHARE = $(shell echo ". scripts/lib_darwin.sh && path_local_share_get" | scripts/environment.sh)
 endif
 endif
 endif
@@ -28,8 +28,8 @@ SOURCE     = ./src
 # release | debug
 BUILD_TYPE = debug
 
-CC       = cc
-CFLAGS_I = -L$(PREFIX)/include -L$(EXTERNAL_SHARE)/include -W -O
+CC       = clang
+CFLAGS_I = -I$(PREFIX)/include -I$(EXTERNAL_SHARE)/include -W -O
 LDLIBS_I = -L$(PREFIX)/lib -L$(EXTERNAL_SHARE)/lib -lraylib -lm
 
 ifeq ($(PLATFORM_OS),MS/Windows)

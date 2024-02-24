@@ -5,11 +5,11 @@
 # project on a best-effort basis.
 
 
-PROGRAM_NAME="$0"
-PROGRAM_VERSION="0.0.1"
-PROGRAM_AUTHOR="polybit"
-PROGRAM_LOCATION="$(dirname "$0")"
-PROGRAM_WORKING_DIRECTORY="$(dirname "$(readlink -f "${PROGRAM_LOCATION}")")"
+export PROGRAM_NAME="$0"
+export PROGRAM_VERSION="0.0.1"
+export PROGRAM_AUTHOR="polybit"
+export PROGRAM_LOCATION="$(dirname "$0")"
+export PROGRAM_WORKING_DIRECTORY="$(dirname "$(readlink -f "${PROGRAM_LOCATION}")")"
 
 
 main() {

@@ -2,7 +2,6 @@
 #define PRIMITIVES_H
 
 
-#include <uchar.h>
 #include <stddef.h>
 
 
@@ -19,8 +18,20 @@ typedef float f32;
 typedef double f64;
 
 typedef char c8;
+
+#ifdef __APPLE__
+
+typedef __UINT16_TYPE__ c16;
+typedef __UINT32_TYPE__ c32;
+
+#else
+
+#include <uchar.h>
+
 typedef char16_t c16;
 typedef char32_t c32;
+
+#endif
 
 typedef ptrdiff_t saddr;
 typedef size_t uaddr;
